@@ -7,6 +7,7 @@ import { Address } from "@shared/domain/vo/address";
 import { Email } from "@shared/domain/vo/email";
 import { FullName } from "@shared/domain/vo/fullname";
 import { SSNumber } from "@shared/domain/vo/ssnumber";
+import { v4 } from 'uuid'
 
 type CustomerOptions = {
     fullname: FullName, 
@@ -19,6 +20,7 @@ type CustomerOptions = {
 export class Customer extends Aggregate {
     
     private constructor(
+        readonly id: string,
         readonly fullname: FullName, 
         readonly email: Email, 
         private _address: Address, 
@@ -51,7 +53,7 @@ export class Customer extends Aggregate {
     }
 
     public static build(options: CustomerOptions): ResultEntity<Customer> {
-        const newCustomer = new Customer(options.fullname, options.email, options.address, options.ssNumber, options.specification)
+        const newCustomer = new Customer(v4(), options.fullname, options.email, options.address, options.ssNumber, options.specification)
         return new ResultEntity(newCustomer)
     }
 }

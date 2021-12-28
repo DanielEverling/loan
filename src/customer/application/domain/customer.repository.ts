@@ -6,7 +6,7 @@ export interface CustomerRepository {
 
     findBySSNumber(number: SSNumber): Customer
     
-    save(customer: Customer)
+    save(customer: Customer): Promise<Customer>
 
     updateAddress(address: Address, ssNumber: SSNumber)
 }
