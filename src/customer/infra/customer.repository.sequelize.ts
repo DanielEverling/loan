@@ -1,34 +1,71 @@
-import { CustomerRepository } from "@base/customer/application/domain/customer.repository";
-import {CustomerSequelize} from './customer.entity.sequelize'
-import { Customer } from "../application/domain/customer";
-import { Address } from "../../shared/domain/vo/address";
+import { CustomerRepository } from '@base/customer/application/domain/customer.repository';
+import { CustomerSequelize } from './customer.entity.sequelize';
+import { Customer } from '../application/domain/customer';
+import { Address } from '../../shared/domain/vo/address';
+import { SSNumber } from '@shared/domain/vo/ssnumber';
+import { DefaultSpecification } from '@shared/domain/default.specification';
+import { FullName } from '@shared/domain/vo/fullname';
+import { Email } from '@shared/domain/vo/email';
 
 export class CustomerRepositorySequelize implements CustomerRepository {
-    findBySSNumber(){
-        return null
+  public async findBySSNumber(ssNumber: SSNumber): Promise<Customer> {
+    const found = await CustomerSequelize.findOne({
+      where: { ssNumber: ssNumber.value },
+    });
+
+    if (!found) {
+      return null;
     }
 
-    public async save(customer: Customer): Promise<Customer> {
-        const sequelizeCustomer = CustomerSequelize.build({
-            id: customer.id,
-            fullname: customer.fullname.value,
-            email: customer.email.value,
-            ssNumber: customer.ssNumber.value,
-            address: customer.address
-        });
-        await sequelizeCustomer.save();
-    
-        return customer;
+    const json = found.toJSON();
+
+    try {
+      console.log('json:', json);
+      const foundCustomer = Customer.build({
+        fullname: FullName.of(json.fullname),
+        email: Email.of(json.email),
+        address: Address.of(
+          json.address.street,
+          json.address.number,
+          json.address.complement,
+          json.address.neighborhood,
+          json.address.city,
+          json.address.state,
+          json.address.zipcode,
+        ),
+        ssNumber: ssNumber, //TODO - ssnumber from repository comes current formatted.
+        specification: DefaultSpecification.of(),
+      });
+      return foundCustomer.entity();
+    } catch (e) {
+      console.log(e);
+      return null;
     }
+  }
 
-    public async updateAddress(address: Address, customerId: string): Promise<Address>{
+  public async save(customer: Customer): Promise<Customer> {
+    const sequelizeCustomer = CustomerSequelize.build({
+      id: customer.id,
+      fullname: customer.fullname.value,
+      email: customer.email.value,
+      ssNumber: customer.ssNumber.value,
+      address: customer.address,
+    });
+    await sequelizeCustomer.save();
 
-        const sequelizeCustomer = await CustomerSequelize.findByPk(customerId)
+    return customer;
+  }
 
-        sequelizeCustomer.setDataValue('address',address)
+  public async updateAddress(
+    address: Address,
+    customerId: string,
+  ): Promise<Address> {
+    const sequelizeCustomer = await CustomerSequelize.findByPk(customerId);
 
-        await sequelizeCustomer.save();
+    sequelizeCustomer.setDataValue('address', address);
 
-        return address
-    }
+    await sequelizeCustomer.save();
+
+    return address;
+  }
 }
