@@ -3,6 +3,8 @@ import { Address } from "@base/shared/domain/vo/address";
 import { Email } from "@base/shared/domain/vo/email";
 import { FullName } from "@base/shared/domain/vo/fullname";
 import { SSNumber } from "@base/shared/domain/vo/ssnumber";
+import { EventPublisher } from "@base/shared/events/event.publisher";
+import { CreatedCustomerEvent } from "@base/shared/events/schema/created.customer.event";
 import { CreateCustomerSpecification } from "../domain/create.customer.specification";
 import { Customer } from "../domain/customer";
 import { CustomerRepository } from "../domain/customer.repository";
@@ -10,7 +12,9 @@ import { CreateCustomerCommand } from "./ create.customer.command";
 
 export class CreateCustomerCommandHandler {
 
-    constructor(private createCustomerSpecification: CreateCustomerSpecification, private customerRepository: CustomerRepository) {}
+    constructor(private createCustomerSpecification: CreateCustomerSpecification, 
+        private customerRepository: CustomerRepository,
+        private eventPublisher: EventPublisher) {}
 
     handler(command: CreateCustomerCommand): Notification[] | void {
 
@@ -23,8 +27,9 @@ export class CreateCustomerCommandHandler {
         })
 
         if (customerResult.isSuccess()) {
-            this.customerRepository.save(customerResult.entity())
-            // publish event to AuthO
+            const customer = customerResult.entity()
+            this.customerRepository.save(customer)
+            this.eventPublisher.publish(new CreatedCustomerEvent(customer.fullname.value, customer.email.value))
             return
         }
         return customerResult.notifications()

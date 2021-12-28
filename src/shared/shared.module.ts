@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
-  imports: [],
+  imports: [EventEmitterModule.forRoot()],
   controllers: [],
   providers: [],
 })
