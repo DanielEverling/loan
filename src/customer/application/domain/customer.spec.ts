@@ -1,9 +1,11 @@
+import { DefaultSpecification } from "@base/shared/domain/default.specification"
 import { Notification } from "@base/shared/domain/notification"
 import { ResultCommand } from "@base/shared/domain/result.command"
 import { Address } from "@shared/domain/vo/address"
 import { Email } from "@shared/domain/vo/email"
 import { FullName } from "@shared/domain/vo/fullname"
 import { SSNumber } from "@shared/domain/vo/ssnumber"
+import { CreateCustomerSpecification } from "./create.customer.specification"
 import { Customer } from "./customer"
 
 describe ('Should validate curstomer rules', () => {
@@ -18,7 +20,8 @@ describe ('Should validate curstomer rules', () => {
             fullname : expectedFullName,
             email : expectedEmail,
             ssNumber : expectedSsNumber,
-            address :expectedAddress
+            address :expectedAddress,
+            specification : DefaultSpecification.of()
         })
 
         const newCustomer = resultCustomer.entity()
@@ -39,7 +42,8 @@ describe ('Should validate curstomer rules', () => {
             fullname : emptyFullName,
             email : emptyEmail,
             ssNumber : emptySsNumber,
-            address : emptyAddress
+            address : emptyAddress,
+            specification : DefaultSpecification.of()
         })
 
         const expectedNotifications = [
@@ -52,7 +56,7 @@ describe ('Should validate curstomer rules', () => {
             Notification.of('State is required.'),
             Notification.of('SS Number should have 9 caracters.'),
         ]
-
+        
         const receivedNotifications = resultCustomer.notifications()
         expect(receivedNotifications.filterNotificationsWithValue()).toEqual(expectedNotifications)
         expect(true).toEqual(resultCustomer.isFail())
@@ -69,7 +73,8 @@ describe ('Should validate curstomer rules', () => {
             fullname : emptyFullName,
             email : emptyEmail,
             ssNumber : emptySsNumber,
-            address : emptyAddress
+            address : emptyAddress,
+            specification : DefaultSpecification.of()
         })
 
         const expectedNotifications = [
@@ -100,7 +105,8 @@ describe ('Should validate curstomer rules', () => {
             fullname : expectedFullName,
             email : expectedEmail,
             ssNumber : expectedSsNumber,
-            address :expectedAddress
+            address :expectedAddress,
+            specification : DefaultSpecification.of()
         })
 
         const newCustomer = resultCustomer.entity()
@@ -120,7 +126,8 @@ describe ('Should validate curstomer rules', () => {
             fullname : expectedFullName,
             email : expectedEmail,
             ssNumber : expectedSsNumber,
-            address :expectedAddress
+            address :expectedAddress,
+            specification : DefaultSpecification.of()
         })
 
         const expectedNotifications = [
@@ -136,5 +143,29 @@ describe ('Should validate curstomer rules', () => {
         const receivedResult = newCustomer.changeAddress(newAddress)
         expect(receivedResult).toEqual(ResultCommand.of(expectedNotifications))
         expect(expectedAddress).toEqual(newCustomer.address)
+    })
+
+    it('should validate customer already registred', () => {
+        const createCustomerSpecification: CreateCustomerSpecification = jest.createMockFromModule("./create.customer.specification")
+        createCustomerSpecification.isSatisfied = jest.fn(customer => Notification.of('some message.'))
+
+        const expectedFullName = FullName.of('John Will')
+        const expectedEmail = Email.of('john@gmail.com')
+        const expectedSsNumber = SSNumber.of('112121212')
+        const expectedAddress =  Address.of('some address', '100', 'NA', 'some neigborhood','some city', 'CA', '10399-111')
+
+        const resultCustomer = Customer.build({
+            fullname : expectedFullName,
+            email : expectedEmail,
+            ssNumber : expectedSsNumber,
+            address : expectedAddress,
+            specification : createCustomerSpecification
+        })
+
+        const expectedNotifications = [
+            Notification.of('some message.')
+        ]
+    
+        expect(resultCustomer.notifications().filterNotificationsWithValue()).toEqual(expectedNotifications)
     })
 })

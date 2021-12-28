@@ -1,4 +1,6 @@
 import { ResultCommand } from "@base/shared/domain/result.command";
+import { Specification } from "@base/shared/domain/specification";
+import { DefaultSpecification } from "@base/shared/domain/default.specification";
 import { Aggregate, ResultEntity } from "@shared/domain/aggregate";
 import { Notification } from "@shared/domain/notification";
 import { Address } from "@shared/domain/vo/address";
@@ -10,7 +12,8 @@ type CustomerOptions = {
     fullname: FullName, 
     email: Email, 
     address: Address, 
-    ssNumber: SSNumber
+    ssNumber: SSNumber,
+    specification: Specification<Customer>,
 }
  
 export class Customer extends Aggregate {
@@ -19,7 +22,8 @@ export class Customer extends Aggregate {
         readonly fullname: FullName, 
         readonly email: Email, 
         private _address: Address, 
-        readonly ssNumber: SSNumber) {
+        readonly ssNumber: SSNumber,
+        private specification: Specification<Customer> = DefaultSpecification.of()) {
         super()
     }
 
@@ -32,7 +36,8 @@ export class Customer extends Aggregate {
             ...this.fullname.validators(),
             ...this.email.validators(),
             ...this._address.validators(),
-            ...this.ssNumber.validators()
+            ...this.ssNumber.validators(),
+            this.specification.isSatisfied(this)
         ]
     }
 
@@ -46,7 +51,7 @@ export class Customer extends Aggregate {
     }
 
     public static build(options: CustomerOptions): ResultEntity<Customer> {
-        const newCustomer = new Customer(options.fullname, options.email, options.address, options.ssNumber)
+        const newCustomer = new Customer(options.fullname, options.email, options.address, options.ssNumber, options.specification)
         return new ResultEntity(newCustomer)
     }
 }
