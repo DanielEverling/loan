@@ -8,5 +8,5 @@ export interface CustomerRepository {
     
     save(customer: Customer): Promise<Customer>
 
-    updateAddress(address: Address, ssNumber: SSNumber)
+    updateAddress(address: Address, customerId: string): Promise<Address>
 }

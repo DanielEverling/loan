@@ -15,7 +15,7 @@ export class ChangeCustomerCommandHandler {
 
             return commandResult.proccess(
                 () => {
-                    this.customerRepository.updateAddress(customer.address, customer.ssNumber)
+                    this.customerRepository.updateAddress(customer.address, customer.id)
                     return
                 }
                 ,
