@@ -2,9 +2,7 @@ import { Notification } from "./notification";
 
 export class ResultCommand {
 
-    private constructor(private readonly notifications: Notification[]) {
-
-    }
+    private constructor(readonly notifications: Notification[]) {}
 
     public static of(notifications: Notification[]): ResultCommand {
         return new ResultCommand(notifications)
@@ -14,11 +12,11 @@ export class ResultCommand {
         return new ResultCommand([])
     }
 
-    public proccess(success: () => void, fail: () => void) {
+    public proccess(success: () => any | void, fail: () => Notification[] | void) {
         if (this.notifications.isEmpty()) {
-            success()
+            return success()
         } else {
-            fail()
+            return fail()
         }
     }
 }
