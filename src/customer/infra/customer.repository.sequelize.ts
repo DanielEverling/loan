@@ -6,8 +6,8 @@ import { SSNumber } from '@shared/domain/vo/ssnumber';
 import { DefaultSpecification } from '@shared/domain/default.specification';
 import { FullName } from '@shared/domain/vo/fullname';
 import { Email } from '@shared/domain/vo/email';
-
 export class CustomerRepositorySequelize implements CustomerRepository {
+
   public async findBySSNumber(ssNumber: SSNumber): Promise<Customer> {
     const found = await CustomerSequelize.findOne({
       where: { ssNumber: ssNumber.value },
@@ -20,7 +20,6 @@ export class CustomerRepositorySequelize implements CustomerRepository {
     const json = found.toJSON();
 
     try {
-      console.log('json:', json);
       const foundCustomer = Customer.build({
         fullname: FullName.of(json.fullname),
         email: Email.of(json.email),
@@ -33,12 +32,11 @@ export class CustomerRepositorySequelize implements CustomerRepository {
           json.address.state,
           json.address.zipcode,
         ),
-        ssNumber: ssNumber, //TODO - ssnumber from repository comes current formatted.
+        ssNumber: ssNumber,
         specification: DefaultSpecification.of(),
       });
       return foundCustomer.entity();
     } catch (e) {
-      console.log(e);
       return null;
     }
   }

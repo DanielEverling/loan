@@ -95,8 +95,6 @@ describe('customer repository sequelize', () => {
 
       const savedCustomer = await CustomerSequelize.findByPk(customer.id);
 
-      console.log(savedCustomer.toJSON().address);
-
       expect(savedCustomer.toJSON().address).toEqual(
         expect.objectContaining(savedAddress),
       );
