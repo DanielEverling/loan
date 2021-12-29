@@ -54,7 +54,7 @@ describe ('Should validate curstomer rules', () => {
             Notification.of('Zipcode is required.'),
             Notification.of('City is required.'),
             Notification.of('State is required.'),
-            Notification.of('SS Number should have 9 caracters.'),
+            Notification.of('SS Number should have 9 characters.'),
         ]
         
         const receivedNotifications = resultCustomer.notifications()
@@ -87,7 +87,7 @@ describe ('Should validate curstomer rules', () => {
             Notification.of('City should be less than 50 characters.'),
             Notification.of('State should be less than 2 characters.'),
             Notification.of('Complement should be less than 100 characters.'),
-            Notification.of('SS Number should have 9 caracters.')
+            Notification.of('SS Number should have 9 characters.')
         ]
 
         const receivedNotifications = resultCustomer.notifications()

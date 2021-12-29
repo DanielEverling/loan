@@ -12,11 +12,8 @@ export class ResultCommand {
         return new ResultCommand([])
     }
 
-    public proccess(success: () => any | void, fail: () => Notification[] | void) {
-        if (this.notifications.isEmpty()) {
-            return success()
-        } else {
-            return fail()
-        }
+    public isSuccess() : boolean {
+        return this.notifications.isEmpty()
     }
+
 }

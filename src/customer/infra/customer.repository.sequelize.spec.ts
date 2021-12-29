@@ -73,7 +73,7 @@ describe('customer repository sequelize', () => {
           email: 'jhondoe@mail.com',
           fullname: 'jhon doe',
           id: customer.id,
-          ssNumber: '111-11-1111',
+          ssNumber: '111111111',
         }),
       );
       expect(customer).toEqual(savedCustomer);

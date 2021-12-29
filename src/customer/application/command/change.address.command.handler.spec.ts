@@ -32,7 +32,7 @@ describe('Should test change address command', () => {
         })
     })
 
-    it('should process command with success', () => {
+    it('should process command with success', async () => {
         const command = {
             ssNumber: '112121212',
             street: 'other address', 
@@ -44,9 +44,9 @@ describe('Should test change address command', () => {
             zipcode: '10399-111'
         }
 
-        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => resultCustomer.entity())
+        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => Promise.resolve(resultCustomer.entity()))
         customerRepository.updateAddress = jest.fn()
-        changeCustomerCommandHandler.handler(command)
+        await changeCustomerCommandHandler.handler(command)
         expect(customerRepository.updateAddress).toHaveBeenCalledTimes(1)
     })
 
@@ -62,7 +62,7 @@ describe('Should test change address command', () => {
             zipcode: '10399-111'
         }
         
-        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => resultCustomer.entity())
+        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => Promise.resolve(resultCustomer.entity()))
         const receivedNotifications = changeCustomerCommandHandler.handler(command)
         expect(customerRepository.updateAddress).not.toHaveBeenCalled
         expect(receivedNotifications).toBeTruthy

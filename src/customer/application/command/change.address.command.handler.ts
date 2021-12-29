@@ -1,3 +1,4 @@
+import { Notification } from "@base/shared/domain/notification"
 import { Address } from "@base/shared/domain/vo/address"
 import { SSNumber } from "@base/shared/domain/vo/ssnumber"
 import { CustomerRepository } from "../domain/customer.repository"
@@ -6,23 +7,18 @@ export class ChangeCustomerCommandHandler {
 
     constructor(private customerRepository: CustomerRepository) {}
 
-    handler(command: ChangeAddressCommand): Notification[] | void {
-        const customer = this.customerRepository.findBySSNumber(SSNumber.of(command.ssNumber))
+    async handler(command: ChangeAddressCommand): Promise<Notification[] | void> {
+        const customer = await this.customerRepository.findBySSNumber(SSNumber.of(command.ssNumber))
         
         if (customer) {
             const newAddress = Address.of(command.street, command.number, command.complement, command.neighborhood, command.city, command.state, command.zipcode)
             const commandResult = customer.changeAddress(newAddress)
 
-            return commandResult.proccess(
-                () => {
-                    this.customerRepository.updateAddress(customer.address, customer.id)
-                    return
-                }
-                ,
-                () => {
-                    return commandResult.notifications
-                }
-            )
+            if (commandResult.isSuccess()) {
+                await this.customerRepository.updateAddress(customer.address, customer.id)
+                return
+            }
+            return commandResult.notifications
         }
     }
 }

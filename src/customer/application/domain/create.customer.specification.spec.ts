@@ -15,7 +15,7 @@ describe ('Should test create customer speficification', () => {
       
     it('should return notification when there is a customer registred', () => {
         const customer: Customer  = jest.createMockFromModule("./customer")
-        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => customer)
+        customerRepository.findBySSNumber = jest.fn(expectedSsNumber => Promise.resolve(customer))
         const notificationReceived = createCustomerSpecification.isSatisfied(customer)
         const expectedNotification = Notification.of('Customer already registered.')
         expect(notificationReceived).toEqual(expectedNotification)
