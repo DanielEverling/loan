@@ -21,6 +21,12 @@ CustomerSequelize.init(
     ssNumber: {
       type: DataTypes.STRING,
     },
+    createdOn: {
+      type: DataTypes.DATE,
+    },
+    updatedOn: {
+      type: DataTypes.DATE,
+    },
   },
   {
     sequelize, // We need to pass the connection instance
